@@ -50,7 +50,7 @@ def was_key_pressed():
         if event.type == pygame.QUIT:
             terminate()
         elif event.type == pygame.KEYUP:
-            run_game()
+            return True
         return False
 
 
@@ -64,6 +64,7 @@ def wait_for_key_pressed():
 
     while True:
         if was_key_pressed():
+            run_game()
             pass
 
 
@@ -112,41 +113,48 @@ def get_random_location():
 def run_game():
     """Main game logic. Return on game over."""
     snake,direction = get_new_snake()
-    food = get_random_location()
-    while True:
+    apple = get_random_location()
+    a,b = snake[len(snake)-1]
+    while a>-1 and a<32 and b>-1 and b<24:
+
+        
+        
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     if direction!="down":
                         direction = "up"
-                        a,b = snake[len(snake)-1]
-                        new_head = (a,b+1)
+                        new_head = (a,b-1)
                         snake.append(new_head)
                         snake.pop(0)
                 if event.key == pygame.K_DOWN:
-                    direction = "down"
-                    a,b = snake[len(snake)-1]
-                    new_head = (a,b-1)
-                    snake.append(new_head)
-                    snake.pop(0)
+                    if direction!="up":
+                        direction = "down"
+                        new_head = (a,b+1)
+                        snake.append(new_head)
+                        snake.pop(0)
                 if event.key == pygame.K_LEFT:
-                    direction = "left"
-                    a,b = snake[len(snake)-1]
-                    new_head = (a-1,b)
-                    snake.append(new_head)
-                    snake.pop(0)
+                    if direction!="right":
+                        direction = "left"
+                        new_head = (a-1,b)
+                        snake.append(new_head)
+                        snake.pop(0)
                 if event.key == pygame.K_RIGHT:
-                    direction = "right"
-                    a,b = snake[len(snake)-1]
-                    new_head = (a+1,b)
-                    snake.append(new_head)
-                    snake.pop(0)
+                    if direction!="left":
+                        direction = "right"
+                        new_head = (a+1,b)
+                        snake.append(new_head)
+                        snake.pop(0)
             elif event.type == pygame.QUIT:
                 terminate()
-            
-            print(direction,snake)
-        
 
+            a,b = snake[len(snake)-1]
+            print(direction,snake)
+            if a>-1 and a<32 and b>-1 and b<24:
+                draw_game_state(snake, apple)
+                pygame.display.update()
+            else:
+                return False
 
 def draw_game_state(snake, apple):
     """Draw the contents on the screen. (Do not modify.)"""
