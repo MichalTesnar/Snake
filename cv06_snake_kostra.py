@@ -38,6 +38,10 @@ def main():
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
 
     show_start_screen()
+    while True:
+        if was_key_pressed():
+            print("play the game")
+            run_game()
     
     
 def terminate():
@@ -50,6 +54,7 @@ def was_key_pressed():
         if event.type == pygame.QUIT:
             terminate()
         elif event.type == pygame.KEYUP:
+            print("play")
             return True
         return False
 
@@ -61,11 +66,6 @@ def wait_for_key_pressed():
     msg_rect.topleft = (WINDOWWIDTH - 200, WINDOWHEIGHT - 30)
     DISPLAYSURF.blit(msg_surface, msg_rect)
     pygame.display.update()
-
-    while True:
-        if was_key_pressed():
-            run_game()
-            pass
 
 
 def show_start_screen():
@@ -105,8 +105,8 @@ def get_new_snake():
 
 def get_random_location():
     """Return a random cell on the game plan."""
-    x = random.randint(0,NUM_CELLS_X)
-    y = random.randint(0,NUM_CELLS_Y)
+    x = random.randint(0,NUM_CELLS_X-1)
+    y = random.randint(0,NUM_CELLS_Y-1)
     return(x,y)
 
 
@@ -116,9 +116,6 @@ def run_game():
     apple = get_random_location()
     a,b = snake[len(snake)-1]
     while a>-1 and a<32 and b>-1 and b<24:
-
-        
-        
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
@@ -126,35 +123,54 @@ def run_game():
                         direction = "up"
                         new_head = (a,b-1)
                         snake.append(new_head)
-                        snake.pop(0)
+                        if new_head!=apple:
+                            snake.pop(0)
+                        else:
+                            apple = get_random_location()
                 if event.key == pygame.K_DOWN:
                     if direction!="up":
                         direction = "down"
                         new_head = (a,b+1)
                         snake.append(new_head)
-                        snake.pop(0)
+                        if new_head!=apple:
+                            snake.pop(0)
+                        else:
+                            apple = get_random_location()
                 if event.key == pygame.K_LEFT:
                     if direction!="right":
                         direction = "left"
                         new_head = (a-1,b)
                         snake.append(new_head)
-                        snake.pop(0)
+                        if new_head!=apple:
+                            snake.pop(0)
+                        else:
+                            apple = get_random_location()
                 if event.key == pygame.K_RIGHT:
                     if direction!="left":
                         direction = "right"
                         new_head = (a+1,b)
                         snake.append(new_head)
-                        snake.pop(0)
+                        if new_head!=apple:
+                            snake.pop(0)
+                        else:
+                            apple = get_random_location()
             elif event.type == pygame.QUIT:
                 terminate()
 
             a,b = snake[len(snake)-1]
-            print(direction,snake)
-            if a>-1 and a<32 and b>-1 and b<24:
+            #print(direction,snake)
+            if (a>-1 and a<32 and b>-1 and b<24) and (len(snake) == len(set(snake))):
                 draw_game_state(snake, apple)
                 pygame.display.update()
             else:
-                return False
+                show_game_over_screen(snake)
+                return True
+
+def show_game_over_screen(snake):
+    text_surf=BASICFONT.render("Konec, skóre:"+str(len(snake)),True,RED,BGCOLOR)
+    text_rect=text_surf.get_rect()
+    text_rect.topleft = (200,200)
+    DISPLAYSURF.blit(text_surf,text_rect)
 
 def draw_game_state(snake, apple):
     """Draw the contents on the screen. (Do not modify.)"""
