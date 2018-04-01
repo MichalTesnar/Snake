@@ -6,7 +6,7 @@ Released under a "Simplified BSD" license
 Modifications by Valdemar Svabensky valdemar@mail.muni.cz
 """
 
-import sys, random, pygame
+import sys, random, pygame, time
 from pygame.locals import *
 
 FPS = 10
@@ -115,61 +115,62 @@ def run_game():
     snake,direction = get_new_snake()
     apple = get_random_location()
     a,b = snake[len(snake)-1]
-    while a>-1 and a<32 and b>-1 and b<24:
+    while (a>-1 and a<32 and b>-1 and b<24) and (len(snake) == len(set(snake))):
         for event in pygame.event.get():
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
                     if direction!="down":
                         direction = "up"
                         new_head = (a,b-1)
-                        snake.append(new_head)
-                        if new_head!=apple:
-                            snake.pop(0)
-                        else:
-                            apple = get_random_location()
-                if event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN:
                     if direction!="up":
                         direction = "down"
                         new_head = (a,b+1)
-                        snake.append(new_head)
-                        if new_head!=apple:
-                            snake.pop(0)
-                        else:
-                            apple = get_random_location()
-                if event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT:
                     if direction!="right":
                         direction = "left"
                         new_head = (a-1,b)
-                        snake.append(new_head)
-                        if new_head!=apple:
-                            snake.pop(0)
-                        else:
-                            apple = get_random_location()
-                if event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT:
                     if direction!="left":
                         direction = "right"
                         new_head = (a+1,b)
-                        snake.append(new_head)
-                        if new_head!=apple:
-                            snake.pop(0)
-                        else:
-                            apple = get_random_location()
             elif event.type == pygame.QUIT:
-                terminate()
+                    terminate()
+        
+        if direction == "up":
+                new_head = (a,b-1)
+        elif direction == "down":
+                new_head = (a,b+1)
+        elif direction == "left":
+                new_head = (a-1,b)
+        elif direction == "right":
+                new_head = (a+1,b)
 
-            a,b = snake[len(snake)-1]
-            #print(direction,snake)
-            if (a>-1 and a<32 and b>-1 and b<24) and (len(snake) == len(set(snake))):
-                draw_game_state(snake, apple)
-                pygame.display.update()
-            else:
-                show_game_over_screen(snake)
-                return True
+        print(snake,direction)        
+
+        snake.append(new_head)
+        if new_head!=apple:
+            snake.pop(0)
+        else:
+            apple = get_random_location()
+            
+        time.sleep(0.2)
+        draw_game_state(snake, apple)
+        pygame.display.update()
+        a,b = snake[len(snake)-1]
+                                                
+    show_game_over_screen(snake)
+    pygame.display.update()
+    return True
 
 def show_game_over_screen(snake):
-    text_surf=BASICFONT.render("Konec, skóre:"+str(len(snake)),True,RED,BGCOLOR)
+    text_surf=BASICFONT.render("Game over! Score:"+str(len(snake)-3),True,RED,BGCOLOR)
     text_rect=text_surf.get_rect()
-    text_rect.topleft = (200,200)
+    text_rect.topleft = (220,220)
+    DISPLAYSURF.blit(text_surf,text_rect)
+    text_surf=BASICFONT.render("Press key twice to play again",True,RED,BGCOLOR)
+    text_rect=text_surf.get_rect()
+    text_rect.topleft = (220,260)
     DISPLAYSURF.blit(text_surf,text_rect)
 
 def draw_game_state(snake, apple):
