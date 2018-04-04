@@ -9,7 +9,7 @@ Modifications by Valdemar Svabensky valdemar@mail.muni.cz
 import sys, random, pygame, time
 from pygame.locals import *
 
-FPS = 10
+FPS = 40
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 CELLSIZE = 20
@@ -27,6 +27,7 @@ DARKGREEN = (0, 155, 0)
 
 # No other constants go here!
 # Testing github
+# Testing github second time :D
 
 def main():
     pygame.init()
@@ -158,6 +159,8 @@ def run_game():
         draw_game_state(snake, apple)
         pygame.display.update()
         a,b = snake[len(snake)-1]
+        FPSCLOCK.tick()
+        
                                                 
     show_game_over_screen(snake)
     pygame.display.update()
